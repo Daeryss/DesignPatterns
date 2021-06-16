@@ -2,14 +2,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class FormalEmailBuilder {
-    /*
-    private String subject;
-    private String sender;
-    private Set<String> recipient = new TreeSet<>();
-    private Set<String> copyTo = new TreeSet<>();
-    private String content;
-     */
-
     public EmailBuilder subject(String subject){
         return new SubjectBuilder(subject);
     }
@@ -50,7 +42,7 @@ public class FormalEmailBuilder {
     private class RecipientBuilder implements Recipient {
         private String subject;
         private String sender;
-        private Set<String> recipient;
+        private Set<String> recipient = new TreeSet<>();
 
         public RecipientBuilder(String subject, String sender, Set<String> recipient) {
             this.subject = subject;
@@ -64,11 +56,13 @@ public class FormalEmailBuilder {
             this.recipient.add(recipient);
         }
 
+        @Override
         public RecipientBuilder to(String newRecipient) {
             recipient.add(newRecipient);
             return new RecipientBuilder(subject, sender, recipient);
         }
 
+        @Override
         public RecipientBuilder toAll(Set<String> recipients) {
             recipient.addAll(recipients);
             return new RecipientBuilder(subject, sender, recipient);
@@ -106,13 +100,15 @@ public class FormalEmailBuilder {
         }
 
         @Override
-        public void copyTo(String copyTo) {
+        public CopyToBuilder copyTo(String copyTo) {
             this.copyTo.add(copyTo);
+            return new CopyToBuilder(subject, sender, recipient, copyTo);
         }
 
         @Override
-        public void copyToAll(Set<String> copyToAll) {
+        public CopyToBuilder copyToAll(Set<String> copyToAll) {
             this.copyTo.addAll(copyToAll);
+            return new CopyToBuilder(subject, sender, recipient, copyTo);
         }
 
         @Override
@@ -127,7 +123,7 @@ public class FormalEmailBuilder {
         private Set<String> recipient = new TreeSet<>();
         private Set<String> copyTo = new TreeSet<>();
         private String content;
-        private String signature = "With best Regards, Sender";
+        private String signature = "default signature";
 
         public ContentBuilder(String subject, String sender, Set<String> recipient, Set<String> copyTo, String content) {
             this.subject = subject;
@@ -137,54 +133,36 @@ public class FormalEmailBuilder {
             this.content = content;
         }
 
-        public void setSignature(String signature) {
-            this.signature = signature;
-        }
-
-        @Override
-        public FinalBuilderInterface build() {
-            content = content + signature;
-            return new FinalBuilder(subject, sender, recipient, copyTo, content);
-        }
-    }
-
-    private class FinalBuilder implements FinalBuilderInterface {
-        private String subject;
-        private String sender;
-        private Set<String> recipient = new TreeSet<>();
-        private Set<String> copyTo = new TreeSet<>();
-        private String content;
-
-        public FinalBuilder(String subject, String sender, Set<String> recipient, Set<String> copyTo, String content) {
+        public ContentBuilder(String subject, String sender, Set<String> recipient, Set<String> copyTo, String content, String signature) {
             this.subject = subject;
             this.sender = sender;
             this.recipient = recipient;
             this.copyTo = copyTo;
             this.content = content;
+            this.signature = signature;
         }
 
         @Override
-        public String toString() {
-            return "FinalBuilder{" +
-                    "subject='" + subject + '\'' +
-                    ", sender='" + sender + '\'' +
-                    ", recipient=" + recipient.toString() +
-                    ", copyTo=" + copyTo.toString() +
-                    ", content='" + content + '\'' +
-                    '}';
+        public ContentBuilder addSignature(String signature) {
+            this.signature = signature;
+            return new ContentBuilder(subject, sender, recipient, copyTo, content, signature);
         }
+
 
         @Override
         public String build() {
-            return "FinalBuilder{" +
+            return "FormalEmailBuilder:\n" +
+
                     "subject='" + subject + '\'' +
-                    ", sender='" + sender + '\'' +
-                    ", recipient=" + recipient +
-                    ", copyTo=" + copyTo +
-                    ", content='" + content + '\'' +
-                    '}';
+                    ", \nsender='" + sender + '\'' +
+                    ", \nrecipient=" + recipient +
+                    ", \ncopyTo=" + copyTo +
+                    ", \n\tcontent='" + content + '\'' +
+                    ", \n\tsignature='" + signature + '\'' + '\n';
         }
     }
+
+
 
     public interface EmailBuilder {
         Sender sender(String sender);
@@ -197,24 +175,26 @@ public class FormalEmailBuilder {
     }
 
     public interface Recipient {
+        Recipient to(String to);
+
+        Recipient toAll(Set<String> toAll);
+
         CopyTo copyTo(String copyTo);
 
         CopyTo copyToAll(Set<String> copyToAll);
     }
 
     public interface CopyTo {
-        void copyTo(String copyTo);
+        CopyTo copyTo(String copyTo);
 
-        void copyToAll(Set<String> copyToAll);
+        CopyTo copyToAll(Set<String> copyToAll);
 
         Content content(String content);
     }
 
     public interface Content {
-        FinalBuilderInterface build();
-    }
+        Content addSignature(String signature);
 
-    public interface FinalBuilderInterface {
         String build();
     }
 }

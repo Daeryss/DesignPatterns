@@ -6,8 +6,30 @@
 
 public class Main {
     public static void main(String[] args) {
-        runFluentEmailBuilder();
-        runFormalEmailBuilder();
+        var mail = new FluentEmailBuilder()
+                .subject("Fluent builder")
+                .sender("ilyas_miftakhov@mail.ru")
+                .to("ilya_sukhachev@ya.ru")
+                .to("ilya_sukhachev@ya.ru")
+                .copyTo("dp_group@i-teco.ru")
+                .content("important content")
+                .build();
+
+        System.out.println(mail);
+
+
+        var formal = new FormalEmailBuilder()
+                .subject("Formal builder")
+                .sender("ilias@miftakhov.ya")
+                .to("ilya@sukhachev.ru")
+                .to("another@recipient.ru")
+                //checking for repetition
+                .to("another@recipient.ru")
+                .copyTo("dp@i-teco.ru")
+                .copyTo("dp@i-teco.ru")
+                .content("implementing formal builder")
+                .addSignature("With best regards Ilyas Miftakhov")
+                .build();
     }
 
     private static void runFormalEmailBuilder(){

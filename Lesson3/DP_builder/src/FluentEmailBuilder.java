@@ -14,7 +14,6 @@ public class FluentEmailBuilder {
             this.subject = subject;
         }
 
-
         public SenderBuilder sender(String sender) {
             return new SenderBuilder(subject, sender);
         }
@@ -42,7 +41,7 @@ public class FluentEmailBuilder {
     public static class RecipientBuilder {
         private String subject;
         private String sender;
-        private ArrayList<String> recipient;
+        private ArrayList<String> recipient = new ArrayList<>();
 
 
         public RecipientBuilder(String subject, String sender, ArrayList<String> recipient) {
@@ -79,8 +78,8 @@ public class FluentEmailBuilder {
     public static class CopyToBuilder {
         private String subject;
         private String sender;
-        private ArrayList<String>  recipient;
-        private ArrayList<String>  copyTo;
+        private ArrayList<String>  recipient = new ArrayList<>();
+        private ArrayList<String>  copyTo = new ArrayList<>();
 
         public CopyToBuilder(String subject, String sender, ArrayList<String>  recipient, String copyTo) {
             this.subject = subject;
@@ -97,13 +96,13 @@ public class FluentEmailBuilder {
         }
 
 
-        public CopyToBuilder copyTo(String copyTo) {
-            this.copyTo.add(copyTo);
+        public CopyToBuilder copyTo(String copy) {
+            copyTo.add(copy);
             return new CopyToBuilder(subject, sender, recipient, copyTo);
         }
 
         public CopyToBuilder copyToAll(ArrayList<String> copyToAll) {
-            this.copyTo.addAll(copyToAll);
+            copyTo.addAll(copyToAll);
             return new CopyToBuilder(subject, sender, recipient, copyTo);
         }
 
@@ -115,8 +114,8 @@ public class FluentEmailBuilder {
     public static class ContentBuilder {
         private String subject;
         private String sender;
-        private ArrayList<String>  recipient;
-        private ArrayList<String> copyTo;
+        private ArrayList<String>  recipient = new ArrayList<>();
+        private ArrayList<String> copyTo = new ArrayList<>();
         private String content;
         private String signature = "With best Regards, Sender";
 
@@ -128,40 +127,70 @@ public class FluentEmailBuilder {
             this.content = content;
         }
 
-        public void setSignature(String signature) {
+        public ContentBuilder(String subject, String sender, ArrayList<String> recipient, ArrayList<String> copyTo, String content, String signature) {
+            this.subject = subject;
+            this.sender = sender;
+            this.recipient = recipient;
+            this.copyTo = copyTo;
+            this.content = content;
             this.signature = signature;
         }
 
+        public ContentBuilder addSignature(String signature) {
+            this.signature = signature;
+            return new ContentBuilder(subject, sender, recipient, copyTo, content, signature);
+        }
 
-        public FinalBuilder build() {
-            content = content + signature;
-            return new FinalBuilder(subject, sender, recipient, copyTo, content);
+
+        public String build() {
+            return "ContentBuilder{" +
+                    "subject='" + subject + '\'' +
+                    ", sender='" + sender + '\'' +
+                    ", recipient=" + recipient +
+                    ", copyTo=" + copyTo +
+                    ", content='" + content + '\'' +
+                    ", signature='" + signature + '\'' +
+                    '}';
         }
     }
 
     public static class FinalBuilder  {
         private String subject;
         private String sender;
-        private ArrayList<String> recipient;
-        private ArrayList<String> copyTo;
+        private ArrayList<String> recipient = new ArrayList<>();
+        private ArrayList<String> copyTo = new ArrayList<>();
         private String content;
 
         public FinalBuilder(String subject, String sender, ArrayList<String>  recipient, ArrayList<String>  copyTo, String content) {
             this.subject = subject;
             this.sender = sender;
-            this.recipient = recipient;
-            this.copyTo = copyTo;
+            this.recipient.addAll(recipient);
+            this.copyTo.addAll(copyTo);
             this.content = content;
         }
 
+
         public String build() {
+            recipient = checkDouble(recipient);
+            copyTo = checkDouble(copyTo);
+
             return "FinalBuilder{" +
                     "subject='" + subject + '\'' +
                     ", sender='" + sender + '\'' +
-                    ", recipient=" + recipient.toString() +
-                    ", copyTo=" + copyTo.toString() +
+                    ", recipient=" + recipient +
+                    ", copyTo=" + copyTo +
                     ", content='" + content + '\'' +
                     '}';
         }
+
+        public ArrayList<String> checkDouble(ArrayList arrayList){
+            Set<String> set = new TreeSet<>();
+            set.addAll(arrayList);
+            ArrayList<String> newArray = new ArrayList<>();
+            newArray.addAll(set);
+
+            return newArray;
+        }
+
     }
 }
