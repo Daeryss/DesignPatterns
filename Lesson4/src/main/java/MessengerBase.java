@@ -2,6 +2,12 @@ public class MessengerBase implements MessengerInterface {
 
     protected MessengerInterface messenger;
 
+    public MessengerBase(MessengerInterface messenger) {
+        this.messenger = messenger;
+    }
+
+    public MessengerBase() {
+    }
 
     @Override
     public void sendMessage(String sender, String recipient, String message) {

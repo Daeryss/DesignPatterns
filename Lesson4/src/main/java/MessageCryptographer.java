@@ -5,6 +5,9 @@ public class MessageCryptographer extends MessengerBase {
         super(messenger);
     }
 
+    public MessageCryptographer() {
+        super();
+    }
 
     public void sendMessage(String sender, String recipient, String message){
         message = String.format("This message have been encrypted %s", message);
