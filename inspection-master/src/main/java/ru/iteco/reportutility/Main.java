@@ -23,11 +23,13 @@ import java.util.Scanner;
 
  */
 public class Main {
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_WHITE = "\u001B[37m";
 
     private static final String TAB = "\t";
 
     // //opt/git/iteco/dp/inspection/src/main/resources/table.txt -withData -weightSum -costSum
-    // D:\DP_lessons\inspection-master\src\main\resources\table.csv -withData -weightSum -costSum
+    // D:\DP_lessons\inspection-master\src\main\resources\table.csv -withData -weightSum -costSum -volumeSum
     // //opt/git/iteco/dp/inspection/src/main/resources/table.csv -withData -weightSum -costSum
     public static void main(String[] args) {
         ReportService service;
@@ -39,8 +41,25 @@ public class Main {
             System.out.println(str);
             var array = str.split(" ");
 
+
             service = getReportService(array);
             var report = service.createReport();
+
+
+            // проверка на наличие хотя бы одного флага
+            while (report.getConfig().isWeightSum() == (false
+                                && report.getConfig().isCountSum() == false
+                                && report.getConfig().isVolumeSum() == false
+                                && report.getConfig().isCostSum() == false)) {
+                System.out.println("you should choose at least one of next flags: «volumeSum»," +
+                        "«weightSum», «costSum», «countSum»");
+                System.out.println("Enter the data for the report.");
+                str = input.nextLine();
+                System.out.println(str);
+                array = str.split(" ");
+                service = getReportService(array);
+                report = service.createReport();
+            }
             printReport(report);
         } catch (Exception e) {
             System.out.println(e);
@@ -70,7 +89,13 @@ public class Main {
 
 
     private static void printReport(Report report) {
+
+        // изменение цвета при отсутствии флага with data
+        if (report.getConfig().isWithData() == false) {
+            System.out.println(ANSI_YELLOW);
+        }
         if (report.getConfig().isWithData() && report.getData() != null && report.getData().length != 0) {
+
             var headerRow = "Наименование\tОбъём упаковки\tМасса упаковки\tСтоимость\tКоличество";
 
             if (report.getConfig().isWithIndex()) {
@@ -103,6 +128,7 @@ public class Main {
                 System.out.println(reportRow.getName() + TAB + reportRow.getValue());
             }
         }
+        System.out.println(ANSI_WHITE);
     }
 
 
