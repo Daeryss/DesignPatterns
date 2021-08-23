@@ -68,7 +68,7 @@ public class Main {
 
     private static ReportService getReportService(String[] args) throws Exception {
         var filename = args[0];
-
+//map снижает логарифмическую сложность
         if (filename.endsWith(".txt")) {
             return new TxtReportService(args);
         }
